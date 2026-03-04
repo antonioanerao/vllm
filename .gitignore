@@ -1,0 +1,5 @@
+.idea
+.vscode
+.env
+Dockerfile.qwen3-4b-fp8
+docker-compose.qwen3-4b-fp8.yml

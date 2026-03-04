@@ -1,0 +1,43 @@
+services:
+  vllm:
+    image: vllm-qwen3:4b-fp8
+    container_name: vllm-qwen-4b-fp8
+    build:
+      context: .
+    command:
+      - vllm
+      - serve
+      - Qwen/Qwen3-4B-FP8
+      - --max-model-len
+      - "30000"
+      - --gpu-memory-utilization
+      - "0.70"
+      - --reasoning-parser
+      - qwen3
+      - --default-chat-template-kwargs
+      - '{"enable_thinking": false}'
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+    ports:
+      - "8000:8000"
+    networks:
+      - proxy
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - HF_HOME=/models
+      - TRANSFORMERS_CACHE=/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    runtime: nvidia
+    restart: unless-stopped
+
+
+networks:
+  proxy:
+    external: true

@@ -1,24 +1,10 @@
-FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
+FROM vllm/vllm-openai:latest
 
-ENV DEBIAN_FRONTEND=noninteractive
 ENV HF_HOME=/models
-ENV TRANSFORMERS_CACHE=/models
 ENV VLLM_WORKER_MULTIPROC_METHOD=spawn
-
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    git \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN pip3 install --upgrade pip
-
-RUN pip3 install vllm
 
 RUN mkdir -p /models
 
-RUN python3 -c "from huggingface_hub import snapshot_download; \
-snapshot_download(repo_id='Qwen/Qwen3-4B-FP8', cache_dir='/models')"
+RUN pip install -U "transformers"
 
 EXPOSE 8000

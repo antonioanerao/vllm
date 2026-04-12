@@ -1,42 +1,51 @@
 services:
   vllm:
-    image: vllm-qwen3:4b-fp8
-    container_name: vllm-qwen-4b-fp8
+    image: vllm
+    container_name: vllm
     build:
       context: .
+      dockerfile: Dockerfile
+    entrypoint: ["vllm", "serve"]
+    shm_size: "8gb"
     command:
-      - vllm
-      - serve
       - Qwen/Qwen3-4B-FP8
+      - --tensor-parallel-size
+      - "2"
+      - --hf-overrides
+      - '{"rope_scaling":{"rope_type":"yarn","factor":2.29,"original_max_position_embeddings":32768}}'
       - --max-model-len
-      - "30000"
-      - --gpu-memory-utilization
-      - "0.70"
+      - "75000"
       - --reasoning-parser
       - qwen3
       - --default-chat-template-kwargs
       - '{"enable_thinking": false}'
+      - --api-key
+      - ${VLLM_API_KEY_1}
+      - --api-key
+      - ${VLLM_API_KEY_2}
       - --host
-      - 0.0.0.0
+      - "0.0.0.0"
       - --port
       - "8000"
-    ports:
-      - "8000:8000"
+    volumes:
+      - ./models:/models
     networks:
       - proxy
     environment:
-      - NVIDIA_VISIBLE_DEVICES=all
-      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
-      - HF_HOME=/models
-      - TRANSFORMERS_CACHE=/models
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - capabilities: [gpu]
+      NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES} 
+      NVIDIA_DRIVER_CAPABILITIES: "compute,utility"
+      HF_HOME: ./models
+      HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
+      VLLM_ALLOW_LONG_MAX_MODEL_LEN: "1"
     runtime: nvidia
     restart: unless-stopped
-
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.vllm.entrypoints=websecure"
+      - "traefik.http.routers.vllm.rule=Host(`${VLLM_HOST}`)"
+      - "traefik.http.routers.vllm.tls=true"
+      - "traefik.http.services.vllm.loadbalancer.server.port=8000"
 
 networks:
   proxy:

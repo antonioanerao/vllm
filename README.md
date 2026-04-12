@@ -1,4 +1,4 @@
-# mpac-vllm-repo
+# Stack para subir vLLM
 
 Este repositório contém uma stack de inferência com **vLLM** para servir o modelo **Qwen/Qwen3-4B-FP8** em Docker com aceleração NVIDIA, exposição via Traefik e configuração por variáveis de ambiente.
 
@@ -70,7 +70,7 @@ HF_TOKEN=hf_token_aqui
 VLLM_API_KEY_1=token_interno_1
 VLLM_API_KEY_2=token_interno_2
 NVIDIA_VISIBLE_DEVICES=GPU-uuid-1,GPU-uuid-2
-VLLM_HOST=transcreveai2.mpac.mp.br
+VLLM_HOST=dominio.com.br
 ```
 
 * Para listar o ID de todas as GPUs, use o comando `nvidia-smi -L`

@@ -34,7 +34,7 @@ services:
     environment:
       NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES} 
       NVIDIA_DRIVER_CAPABILITIES: "compute,utility"
-      HF_HOME: ./models
+      HF_HOME: /models
       HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN}
       VLLM_ALLOW_LONG_MAX_MODEL_LEN: "1"
     runtime: nvidia
